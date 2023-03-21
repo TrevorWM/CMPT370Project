@@ -87,9 +87,11 @@ class Game {
 
         // example - set an object in onStart before starting our render loop!
         this.player = getObject(this.state, "Player");
+        this.wall1 = getObject(this.state, "Wall");
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
         this.createSphereCollider(this.player, 0.5);
+        this.createSphereCollider(this.wall1, 0.5);
 
         
         // example - setting up a key press event to move an object in the scene
@@ -99,22 +101,22 @@ class Game {
 
             switch (e.key) {
                 case "a":
-                    translation = vec3.fromValues(0.1,0,0);
+                    translation = vec3.fromValues(0,0,-0.5);
                     this.moveObject(this.player, translation);
                     break;
 
                 case "d":
-                    translation = vec3.fromValues(-0.1,0,0);
+                    translation = vec3.fromValues(0,0,0.5);
                     this.moveObject(this.player, translation);
                     break;
 
                 case "w":
-                    translation = vec3.fromValues(0,0.1,0);
+                    translation = vec3.fromValues(0.5,0,0);
                     this.moveObject(this.player, translation);
                     break;
 
                 case "s":
-                    translation = vec3.fromValues(0,-0.1,0);
+                    translation = vec3.fromValues(-0.5,0,0);
                     this.moveObject(this.player, translation);
                     break;
 
