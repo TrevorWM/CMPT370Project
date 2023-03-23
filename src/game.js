@@ -42,6 +42,7 @@ class Game {
 
     checkIfMoveValid(object, newPosition)
     {
+        
         let distanceCheck = object.collider.radius - 0.05;
         let distance;
         let closest;
@@ -59,6 +60,7 @@ class Game {
             }   
         });
         return closest > distanceCheck;
+        
     }
 
     moveObject(object, translation)
@@ -74,7 +76,19 @@ class Game {
     checkIfSphereColliding(object, other)
     {
         let distanceVector = vec3.distance(object.model.position, other.model.position);
-        return distanceVector < (object.collider.radius + other.collider.radius);
+        return distanceVector < object.collider.radius;
+    }
+
+    checkIfBoxColliding(object, other)
+    {
+        const x = Math.max(other.collider.dimensions.xMin, Math.min(object.model.position[0], other.collider.dimensions.xMax));
+        const y = Math.max(other.collider.dimensions.yMin, Math.min(object.model.position[1], other.collider.dimensions.yMax));
+        const z = Math.max(other.collider.dimensions.zMin, Math.min(object.model.position[2], other.collider.dimensions.zMax));
+
+        let distance = vec3.distance(object.model.position, vec3.fromValues(x,y,z));
+        
+        console.log(distance);
+        return distance < object.collider.radius;
     }
 
     // example - create a collider on our object with various fields we might need (you will likely need to add/remove/edit how this works)
@@ -91,7 +105,6 @@ class Game {
 
      createBoxCollider(object, onCollide = null)
      {
-        
         object.collider = {
             type: "BOX",
             dimensions: {
@@ -104,7 +117,7 @@ class Game {
             },
             onCollide: onCollide ? onCollide : (otherObject) =>
             {
-
+                console.log(`I was hit by: ${otherObject}`);
             },
         };
         this.setBoxColliderCoordinates(object);
@@ -125,27 +138,36 @@ class Game {
         }
 
 
-        object.collider.dimensions.xMin = Math.min.apply(Math, xVertices);
-        object.collider.dimensions.xMax = Math.max.apply(Math, xVertices);
-        object.collider.dimensions.yMin = Math.min.apply(Math, yVertices);
-        object.collider.dimensions.yMax = Math.max.apply(Math, yVertices);
-        object.collider.dimensions.zMin = Math.min.apply(Math, zVertices);
-        object.collider.dimensions.zMax = Math.max.apply(Math, zVertices);         
+        object.collider.dimensions.xMin = Math.min(...xVertices);
+        object.collider.dimensions.xMax = Math.max(...xVertices);
+        object.collider.dimensions.yMin = Math.min(...yVertices);
+        object.collider.dimensions.yMax = Math.max(...yVertices);
+        object.collider.dimensions.zMin = Math.min(...zVertices);
+        object.collider.dimensions.zMax = Math.max(...zVertices);         
      }
 
     // example - function to check if an object is colliding with collidable objects
      checkCollision(object) {
          // loop over all the other collidable objects 
          this.collidableObjects.forEach( (otherObject) => {
-        
             if (otherObject != object){
+
                 switch(otherObject.collider.type)
                 {
                     case "SPHERE":
                         if(this.checkIfSphereColliding(object, otherObject)){
-                            object.collider.onCollide(otherObject);  
+                            object.collider.onCollide(otherObject);
                         }
-                    break;
+                        break;
+
+                    case "BOX":
+                        if(this.checkIfBoxColliding(object, otherObject)){
+                            object.collider.onCollide(otherObject);
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
                  
             }
@@ -171,9 +193,9 @@ class Game {
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
             console.log(`Player collided with ${otherObject.name}`);
         });
-        this.createBoxCollider(this.wall1, 0.5);
+
+        this.createBoxCollider(this.wall1);
         this.createSphereCollider(this.enemy, 0.5);
-        console.log(this.wall1.collider.dimensions);
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
         // example: spawn some stuff before the scene starts
@@ -224,11 +246,7 @@ class Game {
         // this.cube.rotate('x', deltaTime * 0.5);
 
         // example: Rotate all objects in the scene marked with a flag
-        this.state.objects.forEach((object) => {
-             if (object.name == "Cube") {
-                 object.rotate('x', deltaTime * 0.5);
-             }
-         });
+        
 
         // simulate a collision between the first spawned object and 'cube' 
         // if (this.spawnedObjects[0].collidable) {
