@@ -5,6 +5,36 @@ class Game {
         this.collidableObjects = [];
     }
 
+    handlePlayerMovement(deltaTime)
+    {
+        let speed = 5;
+        let temp = vec3.create();
+
+        if (state.keyboard.w){
+            vec3.add(temp, temp, vec3.fromValues(1,0,0));
+            
+        }
+        
+        if (state.keyboard.a) {
+            vec3.add(temp, temp, vec3.fromValues(0,0,-1));
+
+        }
+        
+        if (state.keyboard.s) {
+            vec3.add(temp, temp, vec3.fromValues(-1,0,0));
+
+        }
+        
+        if (this.state.keyboard.d){
+            vec3.add(temp, temp, vec3.fromValues(0,0,1));
+
+        }
+
+        vec3.scale(temp, temp, deltaTime * speed);
+
+        this.moveObject(this.player, temp);
+    }
+
     // example - we can add our own custom method to our game and call it using 'this.customMethod()'
     customMethod() {
         console.log("Custom method!");
@@ -53,7 +83,7 @@ class Game {
             type: "SPHERE",
             radius: radius,
             onCollide: onCollide ? onCollide : (otherObject) => {
-                console.log(`Collided with ${otherObject.name}`);
+                //console.log(`Collided with ${otherObject.name}`);
             },
          };
          this.collidableObjects.push(object);
@@ -63,14 +93,17 @@ class Game {
      checkCollision(object) {
          // loop over all the other collidable objects 
          this.collidableObjects.forEach( (otherObject) => {
-            // do a check to see if we have collided, if we have we can call object.onCollide(otherObject) which will
-            // call the onCollide we define for that specific object. This way we can handle collisions identically for all
-            // objects that can collide but they can do different things (ie. player colliding vs projectile colliding)
-            // use the modeling transformation for object and otherObject to transform position into current location
+        
             if (otherObject != object){
-                if(this.checkIfSphereColliding(object, otherObject)){
-                    object.collider.onCollide(otherObject);  
-                } 
+                switch(otherObject.collider.type)
+                {
+                    case "SPHERE":
+                        if(this.checkIfSphereColliding(object, otherObject)){
+                            object.collider.onCollide(otherObject);  
+                        }
+                    break;
+                }
+                 
             }
         });
 
@@ -88,44 +121,16 @@ class Game {
         // example - set an object in onStart before starting our render loop!
         this.player = getObject(this.state, "Player");
         this.wall1 = getObject(this.state, "Wall");
+        this.enemy = getObject(this.state, "Enemy");
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
-        this.createSphereCollider(this.player, 0.5);
-        this.createSphereCollider(this.wall1, 0.5);
-
-        
-        // example - setting up a key press event to move an object in the scene
-        document.addEventListener("keypress", (e) => {
-            e.preventDefault();
-            let translation = vec3.create();
-
-            switch (e.key) {
-                case "a":
-                    translation = vec3.fromValues(0,0,-0.5);
-                    this.moveObject(this.player, translation);
-                    break;
-
-                case "d":
-                    translation = vec3.fromValues(0,0,0.5);
-                    this.moveObject(this.player, translation);
-                    break;
-
-                case "w":
-                    translation = vec3.fromValues(0.5,0,0);
-                    this.moveObject(this.player, translation);
-                    break;
-
-                case "s":
-                    translation = vec3.fromValues(-0.5,0,0);
-                    this.moveObject(this.player, translation);
-                    break;
-
-                default:
-                    break;
-            }
+        this.createSphereCollider(this.player, 0.5, (otherObject) => {
+            console.log(`Player collided with ${otherObject.name}`);
         });
+        this.createSphereCollider(this.wall1, 0.5);
+        this.createSphereCollider(this.enemy, 0.5);
 
-        this.customMethod(); // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
+        // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
         // example: spawn some stuff before the scene starts
         // for (let i = 0; i < 10; i++) {
@@ -167,6 +172,8 @@ class Game {
 
     // Runs once every frame non stop after the scene loads
     onUpdate(deltaTime) {
+
+        this.handlePlayerMovement(deltaTime);
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
         // example: Rotate a single object we defined in our start method
@@ -191,8 +198,8 @@ class Game {
 
 
         //example - call our collision check method on our cube
-        // this.collidableObjects.forEach( (object) => {
-        //     this.checkCollision(object);
-        // }); 
+        this.collidableObjects.forEach( (object) => {
+            this.checkCollision(object);
+        }); 
     }
 }
