@@ -89,6 +89,50 @@ class Game {
          this.collidableObjects.push(object);
      }
 
+     createBoxCollider(object, onCollide = null)
+     {
+        
+        object.collider = {
+            type: "BOX",
+            dimensions: {
+                xMin: 0,
+                xMax: 0,
+                yMin: 0,
+                yMax: 0,
+                zMin: 0,
+                zMax: 0,
+            },
+            onCollide: onCollide ? onCollide : (otherObject) =>
+            {
+
+            },
+        };
+        this.setBoxColliderCoordinates(object);
+        this.collidableObjects.push(object);
+     }
+
+     setBoxColliderCoordinates(object)
+     {
+        var xVertices = [];
+        var yVertices = [];
+        var zVertices = [];
+
+        for (let i = 0; i< object.model.vertices.length; i += 3)
+        {
+            xVertices.push(object.model.vertices[i] * object.model.scale[0]); 
+            yVertices.push(object.model.vertices[i+1] * object.model.scale[1]);
+            zVertices.push(object.model.vertices[i+2] * object.model.scale[2]);  
+        }
+
+
+        object.collider.dimensions.xMin = Math.min.apply(Math, xVertices);
+        object.collider.dimensions.xMax = Math.max.apply(Math, xVertices);
+        object.collider.dimensions.yMin = Math.min.apply(Math, yVertices);
+        object.collider.dimensions.yMax = Math.max.apply(Math, yVertices);
+        object.collider.dimensions.zMin = Math.min.apply(Math, zVertices);
+        object.collider.dimensions.zMax = Math.max.apply(Math, zVertices);         
+     }
+
     // example - function to check if an object is colliding with collidable objects
      checkCollision(object) {
          // loop over all the other collidable objects 
@@ -127,9 +171,9 @@ class Game {
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
             console.log(`Player collided with ${otherObject.name}`);
         });
-        this.createSphereCollider(this.wall1, 0.5);
+        this.createBoxCollider(this.wall1, 0.5);
         this.createSphereCollider(this.enemy, 0.5);
-
+        console.log(this.wall1.collider.dimensions);
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
         // example: spawn some stuff before the scene starts
