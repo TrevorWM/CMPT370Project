@@ -10,7 +10,7 @@ class Game {
     handlePlayerMovement(deltaTime)
     {
         let speed = 5;
-        let temp = vec3.create();
+        let temp = vec3.fromValues(0,0,0);
 
         if (state.keyboard.w){
             vec3.add(temp, temp, vec3.fromValues(1,0,0));
@@ -59,14 +59,35 @@ class Game {
         
     }
 
+    checkIfMoveValid(object, newPosition)
+    {
+        let dummy = {
+            name: "Player",
+            model: {
+                position: newPosition,
+                scale: object.model.scale,
+            },
+            centroid: object.centroid,
+            collider: object.collider,
+        };
+
+        this.checkCollision(dummy);
+
+        return !dummy.colliding;
+    }
+
     moveObject(object, translation)
     {
         let nextPosition = vec3.create();
         nextPosition = vec3.add(nextPosition, object.model.position, translation);
-                    
-        if (this.checkIfMoveValid(object, nextPosition)){
+        
+        let valid = this.checkIfMoveValid(object, nextPosition);
+
+        if(valid)
+        {
             object.translate(translation);
         }
+        
     }
 
     checkIfSphereColliding(object, other)
@@ -122,7 +143,6 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
-        //console.log(object);
         let x1 = object.model.position[0] - object.centroid[0] * object.model.scale[0];
         let x2 = object.model.position[0] + object.centroid[0] * object.model.scale[0];
 
@@ -144,14 +164,16 @@ class Game {
      checkCollision(object) {
          // loop over all the other collidable objects 
          this.collidableObjects.forEach( (otherObject) => {
-            if (otherObject != object){
-
+            
+            if (otherObject.name != object.name){
+                
                 switch(otherObject.collider.type)
                 {   
                     case "SPHERE":
                         if(this.checkIfSphereColliding(object, otherObject))
                         {
                             object.collider.onCollide(otherObject);
+                            object.colliding = true;
                         }
                         break;
                     
@@ -159,13 +181,14 @@ class Game {
                         if(this.checkIfBoxColliding(object, otherObject))
                         {
                             object.collider.onCollide(otherObject);
+                            object.colliding = true;
                         }
                         break;
 
                     default:
+                        object.colliding = false;
                         break;
-                }
-                 
+                } 
             }
         });
 
@@ -188,10 +211,7 @@ class Game {
         // no collision can happen
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
             console.log(`Player collided with ${otherObject.name}`);
-            if(otherObject.collider.type == "BOX")
-            {
-                //console.log(otherObject.collider.dimensions);
-            }
+            this.player.colliding = true;
         });
 
         this.createBoxCollider(this.wall1);
