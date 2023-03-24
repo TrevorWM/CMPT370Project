@@ -6,7 +6,55 @@ class Game {
     }
 
     /* CUSTOM METHODS */
+    handleEnemyMovement(deltaTime)
+    {
+        let speed = 0.5;
+        let temp = vec3.create();
+
+        vec3.scale(temp, this.enemy.movementVector, deltaTime * speed);
+
+        let nextPosition = vec3.create();
+        nextPosition = vec3.add(nextPosition, this.enemy.model.position, temp);
+
+        if (this.checkIfMoveValid(this.enemy, nextPosition))
+        {
+            this.enemy.translate(this.enemy.movementVector);
+        } else
+        {
+            this.enemy.movementVector = vec3.fromValues(-1,0,0);
+        }
     
+    }
+
+    getRandomDirectionVector()
+    {
+        let xDirection = this.getRandomDirectionValue();
+        let zDirection = this.getRandomDirectionValue();
+
+        return vec3.fromValues(xDirection, 0, zDirection);
+
+    }
+
+    getRandomDirectionValue()
+    {
+        let value = Math.random();
+
+        if (value < 0.33)
+        {
+            value = -1;
+        } 
+        else if (value > 0.66)
+        {
+            value = 1;
+        } 
+        else 
+        {
+            value = 0;
+        }
+
+        return value;
+    }
+
     handlePlayerMovement(deltaTime)
     {
         let speed = 5;
@@ -34,35 +82,19 @@ class Game {
 
         vec3.scale(temp, temp, deltaTime * speed);
 
-        this.moveObject(this.player, temp);
-    }
+        let nextPosition = vec3.create();
+        nextPosition = vec3.add(nextPosition, this.player.model.position, temp);
 
-    checkIfMoveValid(object, newPosition)
-    {
-        let distanceCheck = object.collider.radius - 0.05;
-        let distance;
-        let closest;
-        
-        this.collidableObjects.forEach( (otherObject) => {
-            
-            if (otherObject != object)
-            {
-                distance = vec3.distance(newPosition, otherObject.model.position);
-                
-                if (closest == null || distance < closest)
-                {
-                    closest = distance;
-                }
-            }   
-        });
-        return closest > distanceCheck;
+        if (this.checkIfMoveValid(this.player, nextPosition)){
+            this.player.translate(temp);
+        }
         
     }
 
     checkIfMoveValid(object, newPosition)
     {
         let dummy = {
-            name: "Player",
+            name: object.name,
             model: {
                 position: newPosition,
                 scale: object.model.scale,
@@ -73,22 +105,11 @@ class Game {
 
         this.checkCollision(dummy);
 
+        object.colliding = dummy.colliding;
+
         return !dummy.colliding;
     }
 
-    moveObject(object, translation)
-    {
-        let nextPosition = vec3.create();
-        nextPosition = vec3.add(nextPosition, object.model.position, translation);
-        
-        let valid = this.checkIfMoveValid(object, nextPosition);
-
-        if(valid)
-        {
-            object.translate(translation);
-        }
-        
-    }
 
     checkIfSphereColliding(object, other)
     {
@@ -135,7 +156,7 @@ class Game {
             },
             onCollide: onCollide ? onCollide : (otherObject) =>
             {
-                console.log(`I was hit by: ${otherObject}`);
+                //console.log(`I was hit by: ${otherObject}`);
             },
         };
         this.collidableObjects.push(object);
@@ -207,10 +228,12 @@ class Game {
         this.player = getObject(this.state, "Player");
         this.wall1 = getObject(this.state, "Wall");
         this.enemy = getObject(this.state, "Enemy");
+        this.enemy.movementVector = vec3.fromValues(1,0,0);
+        this.enemy.colliding = false;
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
-            console.log(`Player collided with ${otherObject.name}`);
+            //console.log(`Player collided with ${otherObject.name}`);
             this.player.colliding = true;
         });
 
@@ -260,6 +283,8 @@ class Game {
     onUpdate(deltaTime) {
         
         this.handlePlayerMovement(deltaTime);
+
+        this.handleEnemyMovement(deltaTime);
         //console.log(this.player.model.position);
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
