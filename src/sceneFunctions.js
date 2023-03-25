@@ -11,6 +11,21 @@ function getObject(state, name) {
     return objectToFind;
 }
 
+function getObjectsWithTag(state, tag)
+{
+    let objects = [];
+
+    for (let i = 0; i < state.objects.length; i++)
+    {
+        if (state.objects[i].tag == tag)
+        {
+            objects.push(state.objects[i]);
+        }
+    }
+
+    return objects;
+}
+
 async function spawnObject(object, state) {
     if (object.type === "mesh") {
         return await addMesh(object);

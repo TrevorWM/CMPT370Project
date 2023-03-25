@@ -32,6 +32,7 @@ class RenderObject {
 
     this.modelMatrix = mat4.create();
     this.lightingShader = this.lightingShader.bind(this);
+    this.tag = object.tag;
   }
 
   rotate(axis, angle) {

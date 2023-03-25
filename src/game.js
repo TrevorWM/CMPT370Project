@@ -66,11 +66,15 @@ class Game {
     handlePlayerMovement(deltaTime)
     {
         let speed = 5;
-        let translation = vec3.fromValues(0,0,0);
+        let translation = vec3.create();
 
         if (this.player.movementType == 3)
         {
             translation = this.getThirdPersonPlayerDirection();
+        }
+        else
+        {
+            //First person movement goes here.
         }
 
         vec3.normalize(translation, translation);
@@ -185,14 +189,9 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
-        let x1 = object.model.position[0] - object.centroid[0] * object.model.scale[0];
-        let x2 = object.model.position[0] + object.centroid[0] * object.model.scale[0];
-
-        let y1 = object.model.position[1] - object.centroid[1] * object.model.scale[1];
-        let y2 = object.model.position[1] + object.centroid[1] * object.model.scale[1];
-
-        let z1 = object.model.position[2] - object.centroid[2] * object.model.scale[2];
-        let z2 = object.model.position[2] + object.centroid[2] * object.model.scale[2];
+        let objectCentroid = vec4.fromValues(object.centroid[0],object.centroid[1],object.centroid[2])
+        let objectPosition = vec4.create();
+        vec4.transformMat4(objectPosition, object.centroid)
 
         object.collider.dimensions.xMin = Math.min(x1,x2);
         object.collider.dimensions.xMax = Math.max(x1,x2);
@@ -233,6 +232,20 @@ class Game {
                 } 
             }
         });
+
+    }
+
+    initializeWallColliders(state)
+    {
+        var walls = getObjectsWithTag(state, "Wall");
+        
+        walls.forEach( (wall) => {
+            this.createBoxCollider(wall, (otherObject) => {
+                console.log(`I was hit by ${otherObject.name}`);
+            });
+        });
+        console.log(walls);
+        return walls;
     }
 
     // runs once on startup after the scene loads the objects
@@ -247,20 +260,27 @@ class Game {
         // example - set an object in onStart before starting our render loop!
         this.player = getObject(this.state, "Player");
         this.player.movementType = 3;
-        this.wall1 = getObject(this.state, "Wall");
+
         this.enemy = getObject(this.state, "Enemy");
         this.enemy.movementVector = vec3.fromValues(1,0,0);
-        //this.enemy.colliding = false;
+
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
         this.createSphereCollider(this.player, 0.5);
         this.createSphereCollider(this.enemy, 0.5, (otherObject) =>{
+            console.log(`I hit ${otherObject.name}`);
             if(otherObject.name == "Player")
             {
                 console.log("GAME OVER");
             }
         });
+        this.wall1 = getObject(this.state, "Wall");
         this.createBoxCollider(this.wall1);
+        this.wall2 = getObject(this.state, "InnerWall-copy");
+        this.createBoxCollider(this.wall2);
+        //this.walls = this.initializeWallColliders(this.state);
+        console.log(this.wall1);
+        console.log(this.wall2);
         
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
@@ -306,7 +326,7 @@ class Game {
     onUpdate(deltaTime) {
         
         this.handlePlayerMovement(deltaTime);
-
+        //console.log(this.player.model.position);
         this.handleEnemyMovement(deltaTime);
         //console.log(this.player.model.position);
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
