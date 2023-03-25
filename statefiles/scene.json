@@ -88,7 +88,7 @@
                 "scale": [
                     1,
                     1,
-                    32
+                    33
                 ],
                 "diffuseTexture": "default.jpg",
                 "normalTexture": "defaultNorm.jpg",
@@ -145,7 +145,7 @@
                 "scale": [
                     1,
                     1,
-                    32
+                    33
                 ],
                 "diffuseTexture": "default.jpg",
                 "normalTexture": "defaultNorm.jpg",
@@ -311,7 +311,7 @@
                 "position": [
                     5.5,
                     0.5,
-                    -6
+                    -5.7
                 ],
                 "scale": [
                     8,
@@ -366,12 +366,12 @@
                 },
                 "type": "cube",
                 "position": [
-                    6,
+                    4.7,
                     0.5,
                     2
                 ],
                 "scale": [
-                    16,
+                    12,
                     1,
                     1
                 ],
@@ -428,7 +428,7 @@
                     -0.5
                 ],
                 "scale": [
-                    8,
+                    7,
                     1,
                     1
                 ],
@@ -480,9 +480,9 @@
                 },
                 "type": "cube",
                 "position": [
-                    2,
+                    1.95,
                     0.5,
-                    0
+                    -0.25
                 ],
                 "scale": [
                     8,
@@ -537,7 +537,7 @@
                 },
                 "type": "cube",
                 "position": [
-                    0,
+                    -0.3,
                     0.5,
                     -2
                 ],
@@ -594,7 +594,7 @@
                 },
                 "type": "cube",
                 "position": [
-                    -1,
+                    -1.25,
                     0.5,
                     -4.5
                 ],
@@ -653,10 +653,10 @@
                 "position": [
                     -5,
                     0.5,
-                    -0.5
+                    0.3
                 ],
                 "scale": [
-                    16,
+                    18,
                     1,
                     1
                 ],
@@ -708,12 +708,12 @@
                 },
                 "type": "cube",
                 "position": [
-                    -3,
+                    -2.65,
                     0.5,
-                    1
+                    1.75
                 ],
                 "scale": [
-                    8,
+                    8.5,
                     1,
                     1
                 ],
@@ -765,12 +765,12 @@
                 },
                 "type": "cube",
                 "position": [
-                    -1,
+                    -0.5,
                     0.5,
-                    5
+                    5.1
                 ],
                 "scale": [
-                    16,
+                    19,
                     1,
                     1
                 ],
@@ -788,63 +788,6 @@
                     0,
                     0,
                     1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1
-                ],
-                "parent": null,
-                "model": null,
-                "tag": "Wall"
-            },
-            {
-                "name": "InnerWall-copy-copy-copy-copy-copy-copy-copy-copy-copy-copy",
-                "material": {
-                    "diffuse": [
-                        0.5882,
-                        0.5882,
-                        0.5882
-                    ],
-                    "ambient": [
-                        0.3,
-                        0.3,
-                        0.3
-                    ],
-                    "specular": [
-                        0.5,
-                        0.5,
-                        0.5
-                    ],
-                    "n": 10.000002,
-                    "shaderType": 1,
-                    "alpha": 1
-                },
-                "type": "cube",
-                "position": [
-                    -5,
-                    0.5,
-                    3.5
-                ],
-                "scale": [
-                    8,
-                    1,
-                    1
-                ],
-                "diffuseTexture": "default.jpg",
-                "normalTexture": "defaultNorm.jpg",
-                "rotation": [
-                    0.000002326794896478912,
-                    0,
-                    -0.9999999999972927,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0.9999999999972927,
-                    0,
-                    0.000002326794896478912,
                     0,
                     0,
                     0,
@@ -879,12 +822,12 @@
                 },
                 "type": "cube",
                 "position": [
-                    -7,
+                    -6.45,
                     0.5,
                     -1.5
                 ],
                 "scale": [
-                    8,
+                    5,
                     1,
                     1
                 ],
@@ -936,12 +879,12 @@
                 },
                 "type": "cube",
                 "position": [
-                    -7,
+                    -6.5,
                     0.5,
                     2
                 ],
                 "scale": [
-                    8,
+                    4.9,
                     1,
                     1
                 ],
@@ -966,7 +909,8 @@
                     1
                 ],
                 "parent": null,
-                "model": null
+                "model": null,
+                "tag": "Wall"
             },
             {
                 "name": "Player",
@@ -1048,7 +992,7 @@
                 },
                 "type": "cube",
                 "position": [
-                    7,
+                    1,
                     0.5,
                     -6.5
                 ],

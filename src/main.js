@@ -125,7 +125,12 @@ async function main() {
         canvas: canvas,
         objectCount: 0,
         lightIndices: [],
-        keyboard: {},
+        keyboard: {
+            w: false,
+            a: false,
+            s: false,
+            d: false,
+        },
         mouse: { sensitivity: 0.2 },
         meshCache: {},
         samplerExists: 0,
@@ -186,6 +191,51 @@ function startRendering(gl, state) {
         const deltaTime = now - then;
         then = now;
 
+        document.addEventListener("keydown", (e) => {
+            switch(e.key)
+            {
+                case "w":
+                    state.keyboard.w = true;
+                    break;
+
+                case "a":
+                    state.keyboard.a = true;
+                    break;
+
+                case "s":
+                    state.keyboard.s = true;
+                    break;
+
+                case "d":
+                    state.keyboard.d = true;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            switch(e.key)
+            {
+                case "w":
+                    state.keyboard.w = false;
+                    break;
+
+                case "a":
+                    state.keyboard.a = false;
+                    break;
+
+                case "s":
+                    state.keyboard.s = false;
+                    break;
+
+                case "d":
+                    state.keyboard.d = false;
+                    break;
+                default:
+                    break;
+            }
+        });
         state.deltaTime = deltaTime;
         drawScene(gl, deltaTime, state);
         game.onUpdate(deltaTime); //constantly call our game loop
