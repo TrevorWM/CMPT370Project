@@ -189,9 +189,34 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
-        let objectCentroid = vec4.fromValues(object.centroid[0],object.centroid[1],object.centroid[2])
-        let objectPosition = vec4.create();
-        vec4.transformMat4(objectPosition, object.centroid)
+        let centroid = vec4.fromValues(object.centroid[0], object.centroid[1], object.centroid[2], 1.0);
+        let negativeCentroid = vec4.create();
+        vec4.negate(negativeCentroid, centroid);
+        
+        let objectMatrix = mat4.fromValues(
+            object.model.modelMatrix[0], object.model.modelMatrix[1], object.model.modelMatrix[2], object.model.modelMatrix[3],
+            object.model.modelMatrix[4], object.model.modelMatrix[5], object.model.modelMatrix[6], object.model.modelMatrix[7],
+            object.model.modelMatrix[8], object.model.modelMatrix[9], object.model.modelMatrix[10], object.model.modelMatrix[11],
+            object.model.modelMatrix[12], object.model.modelMatrix[13],object.model.modelMatrix[14], object.model.modelMatrix[15]);
+
+
+        let centroidValues = vec4.create();
+        
+
+
+        vec4.transformMat4(centroidValues, centroid, objectMatrix);
+
+        vec4.add(centroidValues, centroidValues, negativeCentroid);
+
+        let x1 = centroidValues[0] - (object.centroid[0] * object.model.scale[0]);
+        let x2 = centroidValues[0] + (object.centroid[0] * object.model.scale[0]);
+
+        let y1 = centroidValues[1] - (object.centroid[1] * object.model.scale[1]);
+        let y2 = centroidValues[1] + (object.centroid[1] * object.model.scale[1]);
+
+        let z1 = centroidValues[2] - (object.centroid[2] * object.model.scale[2]);
+        let z2 = centroidValues[2] + (object.centroid[2] * object.model.scale[2]);
+        
 
         object.collider.dimensions.xMin = Math.min(x1,x2);
         object.collider.dimensions.xMax = Math.max(x1,x2);
@@ -274,13 +299,8 @@ class Game {
                 console.log("GAME OVER");
             }
         });
-        this.wall1 = getObject(this.state, "Wall");
-        this.createBoxCollider(this.wall1);
-        this.wall2 = getObject(this.state, "InnerWall-copy");
-        this.createBoxCollider(this.wall2);
-        //this.walls = this.initializeWallColliders(this.state);
-        console.log(this.wall1);
-        console.log(this.wall2);
+        
+        this.walls = this.initializeWallColliders(this.state);
         
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
@@ -326,7 +346,7 @@ class Game {
     onUpdate(deltaTime) {
         
         this.handlePlayerMovement(deltaTime);
-        //console.log(this.player.model.position);
+
         this.handleEnemyMovement(deltaTime);
         //console.log(this.player.model.position);
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
