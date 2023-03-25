@@ -11,7 +11,9 @@ class Game {
         let speed = 3;
         let translation = vec3.create();
 
+        vec3.normalize(translation, translation);
         vec3.scale(translation, this.enemy.movementVector, deltaTime * speed);
+        
 
         let nextPosition = vec3.create();
         nextPosition = vec3.add(nextPosition, this.enemy.model.position, translation);
@@ -64,7 +66,29 @@ class Game {
     handlePlayerMovement(deltaTime)
     {
         let speed = 5;
-        let temp = vec3.fromValues(0,0,0);
+        let translation = vec3.fromValues(0,0,0);
+
+        if (this.player.movementType == 3)
+        {
+            translation = this.getThirdPersonPlayerDirection();
+        }
+
+        vec3.normalize(translation, translation);
+        vec3.scale(translation, translation, deltaTime * speed);
+        
+
+        let nextPosition = vec3.create();
+        nextPosition = vec3.add(nextPosition, this.player.model.position, translation);
+
+        if (this.checkIfMoveValid(this.player, nextPosition)){
+            this.player.translate(translation);
+        }
+        
+    }
+
+    getThirdPersonPlayerDirection()
+    {
+        let temp = vec3.create();
 
         if (state.keyboard.w){
             vec3.add(temp, temp, vec3.fromValues(1,0,0));
@@ -83,18 +107,9 @@ class Game {
         
         if (this.state.keyboard.d){
             vec3.add(temp, temp, vec3.fromValues(0,0,1));
-
         }
 
-        vec3.scale(temp, temp, deltaTime * speed);
-
-        let nextPosition = vec3.create();
-        nextPosition = vec3.add(nextPosition, this.player.model.position, temp);
-
-        if (this.checkIfMoveValid(this.player, nextPosition)){
-            this.player.translate(temp);
-        }
-        
+        return temp;
     }
 
     checkIfMoveValid(object, newPosition)
@@ -218,7 +233,6 @@ class Game {
                 } 
             }
         });
-
     }
 
     // runs once on startup after the scene loads the objects
@@ -232,10 +246,11 @@ class Game {
 
         // example - set an object in onStart before starting our render loop!
         this.player = getObject(this.state, "Player");
+        this.player.movementType = 3;
         this.wall1 = getObject(this.state, "Wall");
         this.enemy = getObject(this.state, "Enemy");
         this.enemy.movementVector = vec3.fromValues(1,0,0);
-        this.enemy.colliding = false;
+        //this.enemy.colliding = false;
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
         this.createSphereCollider(this.player, 0.5);
