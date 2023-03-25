@@ -8,20 +8,21 @@ class Game {
     /* CUSTOM METHODS */
     handleEnemyMovement(deltaTime)
     {
-        let speed = 0.5;
-        let temp = vec3.create();
+        let speed = 3;
+        let translation = vec3.create();
 
-        vec3.scale(temp, this.enemy.movementVector, deltaTime * speed);
+        vec3.scale(translation, this.enemy.movementVector, deltaTime * speed);
 
         let nextPosition = vec3.create();
-        nextPosition = vec3.add(nextPosition, this.enemy.model.position, temp);
+        nextPosition = vec3.add(nextPosition, this.enemy.model.position, translation);
 
         if (this.checkIfMoveValid(this.enemy, nextPosition))
         {
-            this.enemy.translate(this.enemy.movementVector);
-        } else
+            this.enemy.translate(translation);
+        } 
+        else
         {
-            this.enemy.movementVector = vec3.fromValues(-1,0,0);
+            this.enemy.movementVector = this.getRandomDirectionVector();
         }
     
     }
@@ -30,6 +31,11 @@ class Game {
     {
         let xDirection = this.getRandomDirectionValue();
         let zDirection = this.getRandomDirectionValue();
+
+        if (xDirection == 0 && zDirection == 0)
+        {
+            return this.getRandomDirectionVector();
+        }
 
         return vec3.fromValues(xDirection, 0, zDirection);
 
@@ -103,11 +109,11 @@ class Game {
             collider: object.collider,
         };
 
-        this.checkCollision(dummy);
+        this.checkCollisionForSphereColliders(dummy);
 
         object.colliding = dummy.colliding;
 
-        return !dummy.colliding;
+        return !object.colliding;
     }
 
 
@@ -182,8 +188,8 @@ class Game {
      }
 
     // example - function to check if an object is colliding with collidable objects
-     checkCollision(object) {
-         // loop over all the other collidable objects 
+     checkCollisionForSphereColliders(object) {
+         
          this.collidableObjects.forEach( (otherObject) => {
             
             if (otherObject.name != object.name){
@@ -232,13 +238,15 @@ class Game {
         this.enemy.colliding = false;
         // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
         // no collision can happen
-        this.createSphereCollider(this.player, 0.5, (otherObject) => {
-            //console.log(`Player collided with ${otherObject.name}`);
-            this.player.colliding = true;
+        this.createSphereCollider(this.player, 0.5);
+        this.createSphereCollider(this.enemy, 0.5, (otherObject) =>{
+            if(otherObject.name == "Player")
+            {
+                console.log("GAME OVER");
+            }
         });
-
         this.createBoxCollider(this.wall1);
-        this.createSphereCollider(this.enemy, 0.5);
+        
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
         // example: spawn some stuff before the scene starts
@@ -306,8 +314,8 @@ class Game {
 
 
         //example - call our collision check method on our cube
-        this.collidableObjects.forEach( (object) => {
-            this.checkCollision(object);
-        }); 
+        // this.collidableObjects.forEach( (object) => {
+        //     this.checkCollisionForSphere(object);
+        // }); 
     }
 }
