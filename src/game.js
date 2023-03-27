@@ -68,7 +68,7 @@ class Game {
         let speed = 5;
         let translation = vec3.create();
 
-        if (this.player.movementType == 3)
+        if (this.player.firstPerson == false)
         {
             translation = this.getThirdPersonPlayerDirection();
         }
@@ -191,6 +191,7 @@ class Game {
         this.collidableObjects.push(object);
      }
 
+
      setBoxColliderCoordinates(object)
      {
         let centroid = vec4.fromValues(object.centroid[0], object.centroid[1], object.centroid[2], 1.0);
@@ -206,6 +207,7 @@ class Game {
         let centroidValues = vec4.create();
         vec4.transformMat4(centroidValues, centroid, objectMatrix);
         vec4.add(centroidValues, centroidValues, negativeCentroid);
+        
 
         let x1 = centroidValues[0] - (object.centroid[0] * object.model.scale[0]);
         let x2 = centroidValues[0] + (object.centroid[0] * object.model.scale[0]);
@@ -223,6 +225,7 @@ class Game {
         object.collider.dimensions.zMin = Math.min(z1,z2);
         object.collider.dimensions.zMax = Math.max(z1,z2);
         object.collider.dirty = false;
+
      }
 
     // example - function to check if an object is colliding with collidable objects
@@ -269,6 +272,38 @@ class Game {
             });
         });
         return walls;
+
+    }
+
+    handleKeyLogic(state)
+    {
+        const keyCollidableIndex = this.collidableObjects.findIndex((object) => object.name === "Key");
+        const keyStateIndex = this.state.objects.findIndex((object) => object.name === "Key");
+
+        console.log(state.objects);
+        
+        if (keyCollidableIndex > -1)
+        {
+            state.objects.splice(keyStateIndex, 1);
+            this.collidableObjects.splice(keyCollidableIndex, 1);
+        }
+
+        const doorCollidableIndex = this.collidableObjects.findIndex((object) => object.name === "Door");
+        const doorStateIndex = state.objects.findIndex( (object) => object.name === "Door");
+
+        if (doorStateIndex > -1)
+        {
+            state.objects.splice(doorStateIndex, 1);
+            this.collidableObjects.splice(doorCollidableIndex, 1);
+        }
+
+        this.isKeyGrabbed = false;
+    }
+
+    handleGameOverLogic()
+    {
+        location.reload();
+        
     }
 
     // runs once on startup after the scene loads the objects
@@ -284,13 +319,20 @@ class Game {
         //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
+
+            if(otherObject.name == "Enemy")
+            {
+                console.log("GAME OVER");
+                this.handleGameOverLogic();
+            }
+
             if(otherObject.name == "Key")
             {
                 console.log("You grabbed the key!");
                 this.isKeyGrabbed = true;
             }
         });
-        this.player.movementType = 3;
+        this.player.firstPerson = false;
 
         //set up Enemy collider, and default move direction.
         this.enemy = getObject(this.state, "Enemy");
@@ -300,6 +342,7 @@ class Game {
             if(otherObject.name == "Player")
             {
                 console.log("GAME OVER");
+                this.handleGameOverLogic();
             }
 
         });
@@ -365,9 +408,9 @@ class Game {
         
         if(this.isKeyGrabbed)
         {
-            console.log("Key is grabbed!");
+            this.handleKeyLogic(this.state);
         }
-        //console.log(this.player.model.position);
+        
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
         // example: Rotate a single object we defined in our start method

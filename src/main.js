@@ -61,6 +61,7 @@ async function main() {
         uniform mat4 uProjectionMatrix;
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
+        
 
         out vec2 oUV;
         out vec3 oFragPosition;
@@ -97,18 +98,19 @@ async function main() {
         uniform vec3 diffuseVal;
         uniform int samplerExists;
         uniform sampler2D uTexture;
+        uniform float alpha;
 
         out vec4 fragColor;
 
         void main() {
             if(samplerExists == 1) {
                 vec3 textureColour = texture(uTexture, oUV).rgb;
-                fragColor = vec4(diffuseVal * textureColour, 1.0);
+                fragColor = vec4(diffuseVal * textureColour, alpha);
 
             }
             else
             {
-                fragColor = vec4(diffuseVal, 1.0);
+                fragColor = vec4(diffuseVal, alpha);
             }
             
         }
@@ -311,9 +313,8 @@ function drawScene(gl, deltaTime, state) {
             vec3.negate(negCentroid, object.centroid);
             mat4.translate(modelMatrix, modelMatrix, object.model.position);
             mat4.translate(modelMatrix, modelMatrix, object.centroid);
-            mat4.scale(modelMatrix, modelMatrix, object.model.scale);
             mat4.mul(modelMatrix, modelMatrix, object.model.rotation);
-            
+            mat4.scale(modelMatrix, modelMatrix, object.model.scale);
             mat4.translate(modelMatrix, modelMatrix, negCentroid);
 
             if (object.parent) {
@@ -337,6 +338,7 @@ function drawScene(gl, deltaTime, state) {
             gl.uniform3fv(object.programInfo.uniformLocations.ambientVal, object.material.ambient);
             gl.uniform3fv(object.programInfo.uniformLocations.specularVal, object.material.specular);
             gl.uniform1f(object.programInfo.uniformLocations.nVal, object.material.n);
+            gl.uniform1f(object.programInfo.uniformLocations.alpha, object.material.alpha);
 
             let mainLight = state.pointLights[0];
             gl.uniform3fv(gl.getUniformLocation(object.programInfo.program, 'mainLight.position'), mainLight.position);
