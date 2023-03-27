@@ -68,7 +68,7 @@ class Game {
         let speed = 5;
         let translation = vec3.create();
 
-        if (this.player.movementType == 3)
+        if (this.player.firstPerson == false)
         {
             translation = this.getThirdPersonPlayerDirection();
         }
@@ -332,7 +332,7 @@ class Game {
                 this.isKeyGrabbed = true;
             }
         });
-        this.player.movementType = 3;
+        this.player.firstPerson = false;
 
         //set up Enemy collider, and default move direction.
         this.enemy = getObject(this.state, "Enemy");
