@@ -144,8 +144,11 @@ class Game {
 
     checkIfBoxColliding(object, other)
     {
-        this.setBoxColliderCoordinates(other);
-
+        if (other.collider.dirty)
+        {
+            this.setBoxColliderCoordinates(other);
+        }
+        
         const x = Math.max(other.collider.dimensions.xMin, Math.min(object.model.position[0], other.collider.dimensions.xMax));
         const y = Math.max(other.collider.dimensions.yMin, Math.min(object.model.position[1], other.collider.dimensions.yMax));
         const z = Math.max(other.collider.dimensions.zMin, Math.min(object.model.position[2], other.collider.dimensions.zMax));
@@ -183,6 +186,7 @@ class Game {
             {
                 //console.log(`I was hit by: ${otherObject}`);
             },
+            dirty: true,
         };
         this.collidableObjects.push(object);
      }
@@ -199,13 +203,8 @@ class Game {
             object.model.modelMatrix[8], object.model.modelMatrix[9], object.model.modelMatrix[10], object.model.modelMatrix[11],
             object.model.modelMatrix[12], object.model.modelMatrix[13],object.model.modelMatrix[14], object.model.modelMatrix[15]);
 
-
         let centroidValues = vec4.create();
-        
-
-
         vec4.transformMat4(centroidValues, centroid, objectMatrix);
-
         vec4.add(centroidValues, centroidValues, negativeCentroid);
 
         let x1 = centroidValues[0] - (object.centroid[0] * object.model.scale[0]);
@@ -217,13 +216,13 @@ class Game {
         let z1 = centroidValues[2] - (object.centroid[2] * object.model.scale[2]);
         let z2 = centroidValues[2] + (object.centroid[2] * object.model.scale[2]);
         
-
         object.collider.dimensions.xMin = Math.min(x1,x2);
         object.collider.dimensions.xMax = Math.max(x1,x2);
         object.collider.dimensions.yMin = Math.min(y1,y2);
         object.collider.dimensions.yMax = Math.max(y1,y2);
         object.collider.dimensions.zMin = Math.min(z1,z2);
         object.collider.dimensions.zMax = Math.max(z1,z2);
+        object.collider.dirty = false;
      }
 
     // example - function to check if an object is colliding with collidable objects
@@ -269,7 +268,6 @@ class Game {
                 console.log(`I was hit by ${otherObject.name}`);
             });
         });
-        console.log(walls);
         return walls;
     }
 
@@ -282,26 +280,42 @@ class Game {
             e.preventDefault();
         }, false);
 
-        // example - set an object in onStart before starting our render loop!
+        
+        //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
+        this.createSphereCollider(this.player, 0.5, (otherObject) => {
+            if(otherObject.name == "Key")
+            {
+                console.log("You grabbed the key!");
+                this.isKeyGrabbed = true;
+            }
+        });
         this.player.movementType = 3;
 
+        //set up Enemy collider, and default move direction.
         this.enemy = getObject(this.state, "Enemy");
         this.enemy.movementVector = vec3.fromValues(1,0,0);
-
-        // example - create sphere colliders on our two objects as an example, we give 2 objects colliders otherwise
-        // no collision can happen
-        this.createSphereCollider(this.player, 0.5);
         this.createSphereCollider(this.enemy, 0.5, (otherObject) =>{
-            console.log(`I hit ${otherObject.name}`);
+            
             if(otherObject.name == "Player")
             {
                 console.log("GAME OVER");
             }
+
         });
-        
+
+        //Set up the starting door collider
+        this.door = getObject(this.state, "Door");
+        this.createBoxCollider(this.door);
+
+        //Setup the key object
+        this.key = getObject(this.state, "Key");
+        this.createSphereCollider(this.key, 0.5);
+
+        //Loop through all walls and create their colliders.
         this.walls = this.initializeWallColliders(this.state);
-        
+
+        this.isKeyGrabbed = false;
         // calling our custom method! (we could put spawning logic, collision logic etc in there ;) )
 
         // example: spawn some stuff before the scene starts
@@ -348,6 +362,11 @@ class Game {
         this.handlePlayerMovement(deltaTime);
 
         this.handleEnemyMovement(deltaTime);
+        
+        if(this.isKeyGrabbed)
+        {
+            console.log("Key is grabbed!");
+        }
         //console.log(this.player.model.position);
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
