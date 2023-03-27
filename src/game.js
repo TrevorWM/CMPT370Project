@@ -271,6 +271,36 @@ class Game {
         return walls;
     }
 
+    handleKeyLogic(state)
+    {
+        const keyCollidableIndex = this.collidableObjects.findIndex((object) => object.name === "Key");
+        const keyStateIndex = this.state.objects.findIndex((object) => object.name === "Key");
+
+        console.log(state.objects);
+        
+        if (keyCollidableIndex > -1)
+        {
+            state.objects.splice(keyStateIndex, 1);
+            this.collidableObjects.splice(keyCollidableIndex, 1);
+        }
+
+        const doorCollidableIndex = this.collidableObjects.findIndex((object) => object.name === "Door");
+        const doorStateIndex = state.objects.findIndex( (object) => object.name === "Door");
+
+        if (doorStateIndex > -1)
+        {
+            state.objects.splice(doorStateIndex, 1);
+            this.collidableObjects.splice(doorCollidableIndex, 1);
+        }
+
+        this.isKeyGrabbed = false;
+    }
+
+    handleGameOverLogic()
+    {
+        location.reload();
+    }
+
     // runs once on startup after the scene loads the objects
     async onStart() {
         console.log("On start");
@@ -284,6 +314,12 @@ class Game {
         //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
+            if(otherObject.name == "Enemy")
+            {
+                console.log("GAME OVER");
+                this.handleGameOverLogic();
+            }
+
             if(otherObject.name == "Key")
             {
                 console.log("You grabbed the key!");
@@ -300,6 +336,7 @@ class Game {
             if(otherObject.name == "Player")
             {
                 console.log("GAME OVER");
+                this.handleGameOverLogic();
             }
 
         });
@@ -365,9 +402,9 @@ class Game {
         
         if(this.isKeyGrabbed)
         {
-            console.log("Key is grabbed!");
+            this.handleKeyLogic(this.state);
         }
-        //console.log(this.player.model.position);
+        
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
         // example: Rotate a single object we defined in our start method
