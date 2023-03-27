@@ -311,8 +311,9 @@ function drawScene(gl, deltaTime, state) {
             vec3.negate(negCentroid, object.centroid);
             mat4.translate(modelMatrix, modelMatrix, object.model.position);
             mat4.translate(modelMatrix, modelMatrix, object.centroid);
-            mat4.mul(modelMatrix, modelMatrix, object.model.rotation);
             mat4.scale(modelMatrix, modelMatrix, object.model.scale);
+            mat4.mul(modelMatrix, modelMatrix, object.model.rotation);
+            
             mat4.translate(modelMatrix, modelMatrix, negCentroid);
 
             if (object.parent) {
