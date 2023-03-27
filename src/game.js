@@ -191,6 +191,7 @@ class Game {
         this.collidableObjects.push(object);
      }
 
+
      setBoxColliderCoordinates(object)
      {
         let centroid = vec4.fromValues(object.centroid[0], object.centroid[1], object.centroid[2], 1.0);
@@ -206,6 +207,7 @@ class Game {
         let centroidValues = vec4.create();
         vec4.transformMat4(centroidValues, centroid, objectMatrix);
         vec4.add(centroidValues, centroidValues, negativeCentroid);
+        
 
         let x1 = centroidValues[0] - (object.centroid[0] * object.model.scale[0]);
         let x2 = centroidValues[0] + (object.centroid[0] * object.model.scale[0]);
@@ -223,6 +225,7 @@ class Game {
         object.collider.dimensions.zMin = Math.min(z1,z2);
         object.collider.dimensions.zMax = Math.max(z1,z2);
         object.collider.dirty = false;
+
      }
 
     // example - function to check if an object is colliding with collidable objects
@@ -269,6 +272,7 @@ class Game {
             });
         });
         return walls;
+
     }
 
     handleKeyLogic(state)
@@ -299,6 +303,7 @@ class Game {
     handleGameOverLogic()
     {
         location.reload();
+        
     }
 
     // runs once on startup after the scene loads the objects
@@ -314,6 +319,7 @@ class Game {
         //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
+
             if(otherObject.name == "Enemy")
             {
                 console.log("GAME OVER");
