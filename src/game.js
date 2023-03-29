@@ -187,7 +187,7 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
-        
+
         let centroid = vec4.fromValues(...object.centroid, 1.0);
         let scale = vec4.fromValues(...object.model.scale, 1.0);
         vec4.mul(centroid, centroid, scale);
@@ -294,21 +294,25 @@ class Game {
             e.preventDefault();
         }, false);
 
-        
         //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
 
-            if(otherObject.name == "Enemy")
+            switch(otherObject.name)
             {
-                console.log("GAME OVER");
-                this.handleGameOverLogic();
-            }
-
-            if(otherObject.name == "Key")
-            {
-                console.log("You grabbed the key!");
-                this.isKeyGrabbed = true;
+                case "Enemy":
+                    console.log("GAME OVER");
+                    this.handleGameOverLogic();
+                    break;
+                case "Key":
+                    console.log("You grabbed the key!");
+                    this.isKeyGrabbed = true;
+                    break;
+                case "Exit":
+                    printError("You win!", "Good job gamer");
+                    break;
+                default:
+                    break;
             }
         });
         this.player.firstPerson = false;
@@ -333,6 +337,10 @@ class Game {
         //Setup the key object
         this.key = getObject(this.state, "Key");
         this.createSphereCollider(this.key, 0.5);
+
+        //Setup exit object
+        this.exit = getObject(this.state, "Exit");
+        this.createSphereCollider(this.exit, 0.7)
 
         //Loop through all walls and create their colliders.
         this.walls = this.initializeWallColliders(this.state);
@@ -390,6 +398,7 @@ class Game {
             this.handleKeyLogic(this.state);
         }
         
+
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
         // example: Rotate a single object we defined in our start method
