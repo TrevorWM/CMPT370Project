@@ -298,22 +298,22 @@ class Game {
         this.player = getObject(this.state, "Player");
         this.createSphereCollider(this.player, 0.5, (otherObject) => {
 
-            switch(otherObject.name)
+            if(otherObject.name == "Enemy")
             {
-                case "Enemy":
-                    console.log("GAME OVER");
-                    this.handleGameOverLogic();
-                    break;
-                case "Key":
-                    console.log("You grabbed the key!");
-                    this.isKeyGrabbed = true;
-                    break;
-                case "Exit":
-                    printError("You win!", "Good job gamer");
-                    break;
-                default:
-                    break;
+                console.log("GAME OVER");
+                this.handleGameOverLogic();
             }
+
+            else if(otherObject.name == "Key")
+            {
+                console.log("You grabbed the key!");
+                this.isKeyGrabbed = true;
+            }
+            else if(otherObject.name == "Exit")
+            {
+                printError("You win!", "Good job gamer!");
+            }
+            
         });
         this.player.firstPerson = false;
 
