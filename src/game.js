@@ -8,7 +8,7 @@ class Game {
     /* CUSTOM METHODS */
     handleEnemyMovement(deltaTime)
     {
-        let speed = 3;
+        let speed = 8;
         let translation = vec3.create();
 
         vec3.normalize(translation, translation);
@@ -84,9 +84,8 @@ class Game {
         let nextPosition = vec3.create();
         nextPosition = vec3.add(nextPosition, this.player.model.position, translation);
 
-        if (this.checkIfMoveValid(this.player, nextPosition)){
+        if (this.checkIfMoveValid(this.player, nextPosition))
             this.player.translate(translation);
-        }
         
     }
 
@@ -94,24 +93,20 @@ class Game {
     {
         let temp = vec3.create();
 
-        if (state.keyboard.w){
-            vec3.add(temp, temp, vec3.fromValues(1,0,0));
-            
-        }
+        if (state.keyboard.w)
+            vec3.add(temp, temp, vec3.fromValues(1,0,0));    
         
-        if (state.keyboard.a) {
+        
+        if (state.keyboard.a)
             vec3.add(temp, temp, vec3.fromValues(0,0,-1));
 
-        }
         
-        if (state.keyboard.s) {
+        if (state.keyboard.s)
             vec3.add(temp, temp, vec3.fromValues(-1,0,0));
 
-        }
         
-        if (this.state.keyboard.d){
+        if (this.state.keyboard.d)
             vec3.add(temp, temp, vec3.fromValues(0,0,1));
-        }
 
         return temp;
     }
@@ -122,7 +117,6 @@ class Game {
             name: object.name,
             model: {
                 position: newPosition,
-                scale: object.model.scale,
             },
             centroid: object.centroid,
             collider: object.collider,
@@ -145,9 +139,8 @@ class Game {
     checkIfBoxColliding(object, other)
     {
         if (other.collider.dirty)
-        {
             this.setBoxColliderCoordinates(other);
-        }
+        
         
         const x = Math.max(other.collider.dimensions.xMin, Math.min(object.model.position[0], other.collider.dimensions.xMax));
         const y = Math.max(other.collider.dimensions.yMin, Math.min(object.model.position[1], other.collider.dimensions.yMax));
@@ -194,29 +187,17 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
-        let centroid = vec4.fromValues(object.centroid[0], object.centroid[1], object.centroid[2], 1.0);
-        let negativeCentroid = vec4.create();
-        vec4.negate(negativeCentroid, centroid);
-        
-        let objectMatrix = mat4.fromValues(
-            object.model.modelMatrix[0], object.model.modelMatrix[1], object.model.modelMatrix[2], object.model.modelMatrix[3],
-            object.model.modelMatrix[4], object.model.modelMatrix[5], object.model.modelMatrix[6], object.model.modelMatrix[7],
-            object.model.modelMatrix[8], object.model.modelMatrix[9], object.model.modelMatrix[10], object.model.modelMatrix[11],
-            object.model.modelMatrix[12], object.model.modelMatrix[13],object.model.modelMatrix[14], object.model.modelMatrix[15]);
+        let centroid = vec4.fromValues(...object.centroid, 1.0);
+        let position = vec4.fromValues(...object.model.position, 1.0);
 
-        let centroidValues = vec4.create();
-        vec4.transformMat4(centroidValues, centroid, objectMatrix);
-        vec4.add(centroidValues, centroidValues, negativeCentroid);
-        
+        let x1 = position[0] - (centroid[0] * object.model.scale[0]);
+        let x2 = position[0] + (centroid[0] * object.model.scale[0]);
 
-        let x1 = centroidValues[0] - (object.centroid[0] * object.model.scale[0]);
-        let x2 = centroidValues[0] + (object.centroid[0] * object.model.scale[0]);
+        let y1 = position[1] - (centroid[1] * object.model.scale[1]);
+        let y2 = position[1] + (centroid[1] * object.model.scale[1]);
 
-        let y1 = centroidValues[1] - (object.centroid[1] * object.model.scale[1]);
-        let y2 = centroidValues[1] + (object.centroid[1] * object.model.scale[1]);
-
-        let z1 = centroidValues[2] - (object.centroid[2] * object.model.scale[2]);
-        let z2 = centroidValues[2] + (object.centroid[2] * object.model.scale[2]);
+        let z1 = position[2] - (centroid[2] * object.model.scale[2]);
+        let z2 = position[2] + (centroid[2] * object.model.scale[2]);
         
         object.collider.dimensions.xMin = Math.min(x1,x2);
         object.collider.dimensions.xMax = Math.max(x1,x2);
@@ -279,8 +260,6 @@ class Game {
     {
         const keyCollidableIndex = this.collidableObjects.findIndex((object) => object.name === "Key");
         const keyStateIndex = this.state.objects.findIndex((object) => object.name === "Key");
-
-        console.log(state.objects);
         
         if (keyCollidableIndex > -1)
         {
