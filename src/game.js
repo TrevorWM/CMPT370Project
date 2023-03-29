@@ -187,24 +187,24 @@ class Game {
 
      setBoxColliderCoordinates(object)
      {
+        
         let centroid = vec4.fromValues(...object.centroid, 1.0);
+        let scale = vec4.fromValues(...object.model.scale, 1.0);
+        vec4.mul(centroid, centroid, scale);
         let position = vec4.fromValues(...object.model.position, 1.0);
 
-        let x1 = position[0] - (centroid[0] * object.model.scale[0]);
-        let x2 = position[0] + (centroid[0] * object.model.scale[0]);
+        let position1 = vec4.create();
+        let position2 = vec4.create();
 
-        let y1 = position[1] - (centroid[1] * object.model.scale[1]);
-        let y2 = position[1] + (centroid[1] * object.model.scale[1]);
+        vec4.add(position1, position, centroid);
+        vec4.sub(position2, position, centroid);
 
-        let z1 = position[2] - (centroid[2] * object.model.scale[2]);
-        let z2 = position[2] + (centroid[2] * object.model.scale[2]);
-        
-        object.collider.dimensions.xMin = Math.min(x1,x2);
-        object.collider.dimensions.xMax = Math.max(x1,x2);
-        object.collider.dimensions.yMin = Math.min(y1,y2);
-        object.collider.dimensions.yMax = Math.max(y1,y2);
-        object.collider.dimensions.zMin = Math.min(z1,z2);
-        object.collider.dimensions.zMax = Math.max(z1,z2);
+        object.collider.dimensions.xMin = Math.min(position1[0], position2[0]);
+        object.collider.dimensions.xMax = Math.max(position1[0], position2[0]);
+        object.collider.dimensions.yMin = Math.min(position1[1], position2[1]);
+        object.collider.dimensions.yMax = Math.max(position1[1], position2[1]);
+        object.collider.dimensions.zMin = Math.min(position1[2], position2[2]);
+        object.collider.dimensions.zMax = Math.max(position1[2], position2[2]);
         object.collider.dirty = false;
 
      }
