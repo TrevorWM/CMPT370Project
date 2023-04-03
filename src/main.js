@@ -48,6 +48,8 @@ async function main() {
         return;
     }
 
+
+
     /**
      * Sample vertex and fragment shader here that simply applies MVP matrix 
      * and diffuse colour of each object

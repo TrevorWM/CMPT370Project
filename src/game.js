@@ -5,6 +5,10 @@ class Game {
         this.collidableObjects = [];
     }
 
+    delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+      }
+
     /* CUSTOM METHODS */
     handleEnemyMovement(deltaTime)
     {
@@ -277,11 +281,26 @@ class Game {
         }
 
         this.isKeyGrabbed = false;
+        this.displayMessage("Grabbed the Key!", 1000);
     }
 
     handleGameOverLogic()
     {
-        location.reload();
+        this.displayMessage("You Died", 3000);
+        location.reload(); 
+    }
+
+    async displayMessage(message, duration)
+    {
+        let winMessage = document.querySelector("#winMessage");
+        let winNode = document.createTextNode(message);
+        
+        winMessage.appendChild(winNode);
+
+        await new Promise(resolve => setTimeout(resolve, duration));
+        
+        winNode.nodeValue = "";
+        winMessage.appendChild(winNode);
         
     }
 
@@ -293,6 +312,9 @@ class Game {
         document.addEventListener("contextmenu", (e) => {
             e.preventDefault();
         }, false);
+
+        
+        
 
         //Set up player collider and default movement type
         this.player = getObject(this.state, "Player");
@@ -311,11 +333,16 @@ class Game {
             }
             else if(otherObject.name == "Exit")
             {
-                printError("You win!", "Good job gamer!");
+                if(!this.player.win)
+                {
+                    this.displayMessage("You Win!", 5000);
+                    this.player.win = true;
+                }
             }
             
         });
         this.player.firstPerson = false;
+        this.player.win = false;
 
         //set up Enemy collider, and default move direction.
         this.enemy = getObject(this.state, "Enemy");
@@ -393,6 +420,7 @@ class Game {
 
         this.handleEnemyMovement(deltaTime);
         
+
         if(this.isKeyGrabbed)
         {
             this.handleKeyLogic(this.state);
