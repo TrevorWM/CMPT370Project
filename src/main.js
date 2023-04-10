@@ -158,6 +158,7 @@ async function main() {
             a: false,
             s: false,
             d: false,
+            space: false,
         },
         mouse: { sensitivity: 0.2 },
         meshCache: {},
@@ -259,6 +260,9 @@ function startRendering(gl, state) {
 
                 case "d":
                     state.keyboard.d = false;
+                    break;
+                case " ":
+                    state.keyboard.space = true;
                     break;
                 default:
                     break;

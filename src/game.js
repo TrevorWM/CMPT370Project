@@ -78,7 +78,7 @@ class Game {
         }
         else
         {
-            //First person movement goes here.
+            translation = this.getFirstPersonPlayerDirection()
         }
 
         vec3.normalize(translation, translation);
@@ -88,9 +88,34 @@ class Game {
         let nextPosition = vec3.create();
         nextPosition = vec3.add(nextPosition, this.player.model.position, translation);
 
-        if (this.checkIfMoveValid(this.player, nextPosition))
+        if (this.checkIfMoveValid(this.player, nextPosition)){
             this.player.translate(translation);
+            
+            if(this.player.firstPerson)
+            {
+              this.updateFirstPersonView();
+            }
+            
+        }
         
+    }
+    getFirstPersonPlayerDirection()
+    {
+        let temp = vec3.create();
+
+        if (state.keyboard.w) vec3.add(temp, temp, vec3.fromValues(-1, 0, 0));
+
+        if (state.keyboard.a) vec3.add(temp, temp, vec3.fromValues(0, 0, 1));
+
+        if (state.keyboard.s) vec3.add(temp, temp, vec3.fromValues(1, 0, 0));
+
+        if (state.keyboard.d) vec3.add(temp, temp, vec3.fromValues(0, 0, -1));
+
+        if(!vec3.equals(temp, vec3.fromValues(0,0,0))){
+        this.player.lastMovement = temp;
+        }
+        
+        return temp;
     }
 
     getThirdPersonPlayerDirection()
@@ -111,6 +136,10 @@ class Game {
         
         if (this.state.keyboard.d)
             vec3.add(temp, temp, vec3.fromValues(0,0,1));
+
+        if(!vec3.equals(temp, vec3.fromValues(0,0,0))){
+            this.player.lastMovement = temp;
+        }
 
         return temp;
     }
@@ -290,6 +319,31 @@ class Game {
         location.reload(); 
     }
 
+    handleChangeView()
+  {
+    if(!this.player.firstPerson)
+    {
+      this.player.firstPerson = true;
+    }
+    else
+    {
+        this.state.camera.position = vec3.fromValues(0,21,0);
+        this.state.camera.front = vec3.fromValues(1,-10,0);
+        this.player.firstPerson = false;
+    }
+    this.state.keyboard.space = false;
+  }
+
+  updateFirstPersonView()
+  {
+    var playerPos = vec3.fromValues(...this.player.model.position);
+    var offset = vec3.fromValues(0,1,0);
+    vec3.add(offset, playerPos, offset);
+
+    this.state.camera.position = offset;
+    this.state.camera.front = vec3.fromValues(...this.player.lastMovement);
+  }
+
     async displayMessage(message, duration)
     {
         let winMessage = document.querySelector("#winMessage");
@@ -343,6 +397,7 @@ class Game {
         });
         this.player.firstPerson = false;
         this.player.win = false;
+        this.player.lastMovement = vec3.create();
 
         //set up Enemy collider, and default move direction.
         this.enemy = getObject(this.state, "Enemy");
@@ -426,7 +481,10 @@ class Game {
             this.handleKeyLogic(this.state);
         }
         
-
+        if (this.state.keyboard.space)
+        {
+          this.handleChangeView();
+        }
         // TODO - Here we can add game logic, like moving game objects, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
         // example: Rotate a single object we defined in our start method
