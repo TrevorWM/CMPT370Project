@@ -20,7 +20,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -72,12 +72,12 @@
                         0.3
                     ],
                     "specular": [
-                        0.5,
-                        0.5,
-                        0.5
+                        0.2,
+                        0.2,
+                        0.2
                     ],
-                    "n": 10.000002,
-                    "shaderType": 4,
+                    "n": 100,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "plane",
@@ -91,7 +91,7 @@
                     1,
                     32
                 ],
-                "diffuseTexture": "default.jpg",
+                "diffuseTexture": "plywood.jpg",
                 "normalTexture": "defaultNorm.jpg",
                 "rotation": [
                     1,
@@ -189,7 +189,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -246,7 +246,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -302,7 +302,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -359,7 +359,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -416,7 +416,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -473,7 +473,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -530,7 +530,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -587,7 +587,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -644,7 +644,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -658,7 +658,7 @@
                     1,
                     1
                 ],
-                "diffuseTexture": "default.jpg",
+                "diffuseTexture": "concreteBricks.jpg",
                 "normalTexture": "defaultNorm.jpg",
                 "rotation": [
                     1,
@@ -700,7 +700,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -757,7 +757,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -814,7 +814,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -871,7 +871,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -928,7 +928,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -1041,7 +1041,7 @@
                         0.5
                     ],
                     "n": 10.000002,
-                    "shaderType": 1,
+                    "shaderType": 3,
                     "alpha": 1
                 },
                 "type": "cube",
@@ -1140,16 +1140,16 @@
             {
                 "name": "pointLight1",
                 "colour": [
-                    1,
-                    1,
-                    1
+                    0.4,
+                    0.4,
+                    0.4
                 ],
                 "position": [
                     0,
-                    5,
+                    21,
                     0
                 ],
-                "strength": 2,
+                "strength": 1,
                 "quadratic": 0.035,
                 "linear": 0.09,
                 "constant": 1,

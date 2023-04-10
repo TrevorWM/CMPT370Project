@@ -55,65 +55,89 @@ async function main() {
      * and diffuse colour of each object
      */
     const vertShaderSample =
-        `#version 300 es
-        in vec3 aPosition;
-        in vec3 aNormal;
-        in vec2 aUV;
+    `#version 300 es
+    in vec3 aPosition;
+    in vec3 aNormal; 
+    
 
-        uniform mat4 uProjectionMatrix;
-        uniform mat4 uViewMatrix;
-        uniform mat4 uModelMatrix;
-        
+    uniform mat4 uProjectionMatrix;
+    uniform mat4 uViewMatrix;
+    uniform mat4 uModelMatrix;
+    uniform mat4 normalMat;
+    uniform vec3 uCameraPosition;
+    
 
-        out vec2 oUV;
-        out vec3 oFragPosition;
-        out vec3 oNormal;
+    out vec3 oFragPosition;
+    out vec3 oNormal;
+    out vec3 oCameraPosition;
 
-        void main() 
-        {
-            // Postion of the fragment in world space
-            gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
+    
+    in vec2 aUV;
+    out vec2 oUV;
 
-            // Simply use this normal so no error is thrown
-            oNormal = normalize((uModelMatrix * vec4(aNormal, 1.0)).xyz);
+    void main() 
+    {
+        // Postion of the fragment in world space
+        gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
 
-            oUV = aUV;
-            oFragPosition = (uModelMatrix * vec4(aPosition, 1.0)).xyz;
-        }
-        `;
+        // Simply use this normal so no error is thrown
+
+        oFragPosition = (uModelMatrix * vec4(aPosition, 1.0)).xyz;
+
+        oCameraPosition = uCameraPosition;
+        oNormal = vec3((normalMat * vec4(aNormal, 0.0)).xyz);
+        oUV = aUV;
+    }
+    `;
 
     const fragShaderSample =
         `#version 300 es
         #define MAX_LIGHTS 20
         precision highp float;
 
-        struct PointLight
-        {
+        out vec4 fragColor;
+
+        in vec3 oNormal;
+        in vec3 oFragPosition;
+        in vec3 oCameraPosition;
+
+        struct PointLight {
             vec3 position;
             vec3 colour;
             float strength;
         };
 
         in vec2 oUV;
+        in vec2 aUV;
 
         uniform PointLight mainLight;
         uniform vec3 diffuseVal;
-        uniform int samplerExists;
-        uniform sampler2D uTexture;
+        uniform vec3 ambientVal;
+        uniform vec3 specularVal;
+        uniform float nVal;
         uniform float alpha;
 
-        out vec4 fragColor;
-
+        uniform int samplerExists;
+        uniform sampler2D uTexture;
+        
         void main() {
-            if(samplerExists == 1) {
-                vec3 textureColour = texture(uTexture, oUV).rgb;
-                fragColor = vec4(diffuseVal * textureColour, alpha);
+            vec3 normal = normalize(oNormal);
+            
+            vec3 ambient = ambientVal * mainLight.colour;
 
+            vec3 L = normalize(mainLight.position - oFragPosition);
+            vec3 diffuse = diffuseVal * mainLight.colour * max(dot(normal, L), 0.0);
+
+            vec3 viewVector = normalize(oCameraPosition - oFragPosition);
+            vec3 H = normalize(L + viewVector);
+            vec3 specular = specularVal * vec3(1.0, 1.0, 1.0) * pow(max(dot(normal, H), 0.0), nVal);
+
+            if(samplerExists == 1) {
+                vec4 textureColour = texture(uTexture, oUV);
+                diffuse = mix(diffuseVal, textureColour.rgb, 0.8);
             }
-            else
-            {
-                fragColor = vec4(diffuseVal, alpha);
-            }
+            
+            fragColor = vec4(ambient + diffuse + specular, alpha);
             
         }
         `;
